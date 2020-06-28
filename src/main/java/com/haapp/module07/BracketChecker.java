@@ -9,16 +9,31 @@ public class BracketChecker implements Runnable {
 
     private static final String OPEN_BRACKETS = "({[<";
     private static final String CLOSE_BRACKETS = ")}]>";
-    private static String inComeLine;
+    private String inComeLine;
+
+    public BracketChecker() {
+    }
+
+    public BracketChecker(String inComeLine) {
+        this.inComeLine = inComeLine;
+    }
+
+    public String getInComeLine() {
+        return inComeLine;
+    }
+
+    public void setInComeLine(String inComeLine) {
+        this.inComeLine = inComeLine;
+    }
 
     public void run() {
 
         try {
-            fileReader("src/main/resources/income.txt");
+//            fileReader("src/main/resources/income.txt");
             if (!checkBracket(inComeLine)) {
                 throw new BracketException("The brackets are wrong in your string: " + inComeLine);
             }
-            System.out.println("INFO: The brackets are placed correctly in your string: " + inComeLine);
+            System.out.println("RESULT INFO: The brackets are placed correctly in your string: " + inComeLine);
         } catch (BracketException ex) {
             System.out.println(ex.getMessage());
         }
@@ -46,13 +61,13 @@ public class BracketChecker implements Runnable {
         return result.get();
     }
 
-    private void fileReader(String filePath) {
-        try (FileReader fr = new FileReader(filePath); BufferedReader reader = new BufferedReader(fr)) {
-            inComeLine = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void fileReader(String filePath) {
+//        try (FileReader fr = new FileReader(filePath); BufferedReader reader = new BufferedReader(fr)) {
+//            inComeLine = reader.readLine();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
 
 
