@@ -1,5 +1,6 @@
 package com.haapp.module07;
 
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -8,40 +9,38 @@ public class Module07 {
 
     private static final String OPEN_BRACKETS = "({[<";
     private static final String CLOSE_BRACKETS = ")}]>";
+    private static String inComeLine;
+    private static int counter;
 
-    private static final String SEPARATOR_LINE = "------------------------------------------------------------------";
-    private static List<Character> inCome;
 
     public static void main(String[] args) {
 
-        try (Scanner in = new Scanner(System.in)) {
-            separate();
-            System.out.println("Please, type a string with some brackets and press ENTER:");
-            String inComeLineFromConsole = in.nextLine();
-            if (checkBracket(inComeLineFromConsole)) {
-                System.out.println("INFO: The brackets are placed correctly in your string: " + inComeLineFromConsole);
-            }else{
-                throw new BracketException("The brackets are wrong");
+        Runnable check = Module07::run;
+
+        for (int i = 0; i < 1000; i++){
+            Thread thread = new Thread(check);
+            thread.start();
+            counter++;
+        }
+    }
+
+    private static void run() {
+        try {
+            fileReader("src/main/resources/income.txt");
+            if (!checkBracket(inComeLine)) {
+                throw new BracketException("The brackets are wrong in your string: " + inComeLine);
             }
-            separate();
+            System.out.println("INFO: The brackets are placed correctly in your string: " + inComeLine);
         } catch (BracketException ex) {
             System.out.println(ex.getMessage());
         }
     }
 
-    private static void separate() {
-        System.out.println(SEPARATOR_LINE);
-    }
-
-    private static boolean checkBracket(String inComeLineFromConsole) throws BracketException {
-
-        inCome = inComeLineFromConsole.chars().mapToObj(c -> (char) c).collect(Collectors.toList());
-
+    private static boolean checkBracket(String inComeLine) {
+        List<Character> listInComeChars = inComeLine.chars().mapToObj(c -> (char) c).collect(Collectors.toList());
         Stack<Character> bracketStack = new Stack<Character>();
-
         AtomicBoolean result = new AtomicBoolean(true);
-
-        inCome.stream().peek(i -> {
+        listInComeChars.stream().peek(i -> {
                     if (OPEN_BRACKETS.contains(i.toString())) {
                         bracketStack.push(i);
                     }
@@ -53,10 +52,19 @@ public class Module07 {
                     }
                 }
         ).collect(Collectors.toList());
-
-        if (!bracketStack.isEmpty()){
+        if (!bracketStack.isEmpty()) {
             result.set(false);
         }
         return result.get();
     }
+
+    private static void fileReader(String filePath) {
+        try (FileReader fr = new FileReader(filePath); BufferedReader reader = new BufferedReader(fr)) {
+                inComeLine = reader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
+
+
